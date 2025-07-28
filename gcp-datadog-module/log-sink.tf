@@ -16,9 +16,9 @@
 ######## LOG SINKS CREATION AT THE PROJECT/FOLDER LEVEL  ###########
 ####################################################################
 
-# Create a logging sink at the PROJECT scope | if variable 'log_sink_in_folder' is 'true' this resource will not be created.
+# Create a logging sink at the PROJECT scope | if variable 'log_sink_in_folder' or 'log_sink_in_org' is 'true' this resource will not be created.
 resource "google_logging_project_sink" "datadog_export_sink" {
-  count = var.log_sink_in_folder ? 0 : 1
+  count = var.log_sink_in_org || var.log_sink_in_folder ? 0 : 1
 
   name                   = "datadog-export-sink"
   description            = "Project Sink to route logs from GCP to Datadog."
@@ -40,6 +40,17 @@ resource "google_logging_folder_sink" "datadog_export_sink" {
   include_children = true
 }
 
+# Create a logging sink at the ORGANIZATION scope | if variable 'log_sink_in_org' is 'false' or not used this resource will not be created.
+resource "google_logging_organization_sink" "datadog_export_sink" {
+  count = var.log_sink_in_org ? 1 : 0
+
+  name             = "datadog-export-sink"
+  description      = "Org Sink to route logs from GCP to Datadog."
+  org_id           = var.organization_id
+  destination      = "pubsub.googleapis.com/projects/${var.project_id}/topics/${var.topic_name}"
+  filter           = var.inclusion_filter
+  include_children = true
+}
 #########################################################################
 # CREATE A BUCKET WITH A RANDOM ID NAME TO PUT DATAFLOW TEMPORARY FILES #
 #########################################################################

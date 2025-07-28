@@ -45,7 +45,7 @@ resource "google_pubsub_subscription" "datadog_topic_sub" {
 
 # Define IAM permissions for the Log Sink identity to publish logs to the topic (Sink at the PROJECT level)
 resource "google_pubsub_topic_iam_member" "logs_sa_publishing_permissions" {
-  count   = var.log_sink_in_folder ? 0 : 1
+  count   = var.log_sink_in_org || var.log_sink_in_folder ? 0 : 1
   project = var.project_id
   topic   = google_pubsub_topic.datadog_topic.id
   role    = "roles/pubsub.publisher"
@@ -59,6 +59,15 @@ resource "google_pubsub_topic_iam_member" "logs_sa_publishing_permissions_folder
   topic   = google_pubsub_topic.datadog_topic.id
   role    = "roles/pubsub.publisher"
   member  = "serviceAccount:service-folder-${var.folder_id}@gcp-sa-logging.iam.gserviceaccount.com"
+}
+
+# Define IAM permissions for the Log Sink identity to publish logs to the topic (Sink at the ORG level)
+resource "google_pubsub_topic_iam_member" "logs_sa_publishing_permissions_org" {
+  count   = var.log_sink_in_org ? 1 : 0
+  project = var.project_id
+  topic   = google_pubsub_topic.datadog_topic.id
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:service-org-${var.organization_id}@gcp-sa-logging.iam.gserviceaccount.com"
 }
 
 #########################################################

@@ -79,6 +79,17 @@ variable "folder_id" {
   default     = ""
 }
 
+variable "organization_id" {
+  description = "The ID of the GCP organization."
+  type        = string
+}
+
+variable "log_sink_in_org" {
+  description = "Set to true if the Log Sink should be created at the organization level."
+  type        = bool
+  default     = false
+}
+
 variable "inclusion_filter" {
   type        = string
   description = "Inclusion filter to be used by the Log sink for the logs to be forwarded to Datadog."

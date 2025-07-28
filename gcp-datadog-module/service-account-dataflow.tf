@@ -30,8 +30,38 @@ resource "google_project_iam_member" "dataflow_datadog_sa_roles" {
     "roles/pubsub.subscriber",
     "roles/pubsub.publisher",
     "roles/secretmanager.secretAccessor",
-    "roles/storage.objectAdmin"
+    "roles/storage.objectAdmin",
+    "roles/dataflow.serviceAgent"
   ])
   role   = each.key
   member = "serviceAccount:${google_service_account.dataflow_datadog_export_sa.email}"
+}
+
+# Define IAM roles needed for the default Dataflow Service Account
+resource "google_project_iam_member" "default_dataflow_sa_roles" {
+  project = var.project_id
+  for_each = toset([
+    "roles/dataflow.admin",
+    "roles/dataflow.worker",
+    "roles/pubsub.viewer",
+    "roles/pubsub.subscriber",
+    "roles/pubsub.publisher",
+    "roles/secretmanager.secretAccessor",
+    "roles/storage.objectAdmin",
+    "roles/dataflow.serviceAgent"
+  ])
+  role   = each.key
+  member = "serviceAccount:service-${data.google_project.project.number}@dataflow-service-producer-prod.iam.gserviceaccount.com"
+}
+
+# Define IAM roles needed for the default Compute Service Account
+resource "google_project_iam_member" "default_compute_sa_roles_project" {
+  project = var.project_id
+  for_each = toset([
+    "roles/storage.objectViewer",
+    "roles/dataflow.serviceAgent",
+    "roles/compute.serviceAgent"
+  ])
+  role   = each.key
+  member = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
 }
