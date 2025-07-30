@@ -72,6 +72,27 @@ module "datadog-integration" {
 }
 ```
 
+### Use a Log sink at the organization level
+
+```hcl
+module "datadog-integration" {
+  source                    = "./gcp-datadog-module"
+  project_id                = "my-gcp-project-id"
+  dataflow_job_name         = "datadog-export-job"
+  dataflow_temp_bucket_name = "my-temp-bucket"
+  topic_name                = "datadog-export-topic"
+  subscription_name         = "datadog-export-sub"
+  vpc_name                  = "vpc-name"
+  subnet_name               = "subnet-name"
+  subnet_region             = "us-east1"
+  datadog_api_key           = "ab1c23d4ef56789a0bc1d23ef45ab6789"
+  datadog_site_url          = "https://http-intake.logs.us5.datadoghq.com"
+  log_sink_in_org           = true
+  organization_id           = "123456789012"
+  inclusion_filter          = "resource.type=gce_instance AND protoPayload.methodName=v1.compute.instances.stop"
+}
+```
+
 ### Use a Log sink at the project level
 
 ```hcl
@@ -106,7 +127,9 @@ module "datadog-integration" {
 | datadog_api_key    | string | Datadog API Key for integration.                                    | | "ab1c23d4ef56789a0bc1d23ef45ab6789" |
 | datadog_site_url   | string | Datadog Logs API URL, it depends on the Datadog site region (see [Datadog documentation](https://docs.datadoghq.com/integrations/google_cloud_platform/#4-create-and-run-the-dataflow-job)). |  | "https://http-intake.logs.datadoghq.com" |
 | log_sink_in_folder | boolean| Set to true if the Log Sink should be created at the folder level.                   | false | true |
-| folder_id          | string | Folder ID where the Log Sink should be created. Set to null if not in a folder.      | ""  | "123456789012" | 
+| folder_id          | string | Folder ID where the Log Sink should be created. Set to null if not in a folder.      | ""  | "123456789012" |
+| log_sink_in_org    | boolean| Set to true if the Log Sink should be created at the organization level.             | false | true |
+| organization_id    | string | Organization ID where the Log Sink should be created. Set to null if not for org.    | ""  | "123456789012" | 
 | inclusion_filter   | string | Inclusion filter to be used by the Log sink for the logs to be forwarded to Datadog. | ""    | "resource.type=gce_instance AND resource.labels.project_id=my-project-id"
 
 ## Outputs

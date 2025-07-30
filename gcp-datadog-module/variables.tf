@@ -82,6 +82,7 @@ variable "folder_id" {
 variable "organization_id" {
   description = "The ID of the GCP organization."
   type        = string
+  default     = ""
 }
 
 variable "log_sink_in_org" {
